@@ -1,0 +1,137 @@
+.doc-content {
+  font-family: var(--doc-font, Georgia, serif);
+  font-size: var(--doc-size, 16px);
+  line-height: var(--doc-lh, 1.7);
+  color: var(--doc-color, #1a1a1a);
+  background: var(--doc-bg, #ffffff);
+  padding: var(--doc-pad, 40px 48px);
+  word-break: break-word;
+}
+
+.doc-content h1,
+.doc-content h2,
+.doc-content h3,
+.doc-content h4,
+.doc-content h5,
+.doc-content h6 {
+  color: var(--doc-heading, #111111);
+  margin-top: 1.5em;
+  margin-bottom: 0.4em;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.doc-content h1 {
+  font-size: 2em;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.3em;
+  margin-top: 0;
+}
+
+.doc-content h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.2em;
+}
+
+.doc-content h3 { font-size: 1.25em; }
+.doc-content h4 { font-size: 1.1em; }
+.doc-content h5 { font-size: 1em; }
+.doc-content h6 { font-size: 0.9em; color: #555; }
+
+.doc-content p { margin: 0 0 1em; }
+
+.doc-content a {
+  color: var(--doc-link, #2563eb);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.doc-content strong { font-weight: 700; }
+.doc-content em { font-style: italic; }
+
+.doc-content code {
+  font-family: var(--doc-code-font, 'Fira Code', 'Courier New', monospace);
+  background: var(--doc-code-bg, #f4f4f5);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+
+.doc-content pre {
+  background: var(--doc-code-bg, #f4f4f5);
+  padding: 1em 1.25em;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0 0 1em;
+}
+
+.doc-content pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.875em;
+}
+
+.doc-content blockquote {
+  border-left: 4px solid var(--doc-link, #2563eb);
+  margin: 0 0 1em;
+  padding: 0.5em 1em;
+  color: #555;
+}
+
+.doc-content blockquote > p:last-child { margin-bottom: 0; }
+
+.doc-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0 0 1em;
+  font-size: 0.9em;
+}
+
+.doc-content th,
+.doc-content td {
+  border: 1px solid #ddd;
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.doc-content th {
+  background: rgba(0, 0, 0, 0.04);
+  font-weight: 600;
+}
+
+.doc-content tr:nth-child(even) td {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.doc-content ul,
+.doc-content ol {
+  margin: 0 0 1em;
+  padding-left: 1.75em;
+}
+
+.doc-content li { margin-bottom: 0.3em; }
+
+.doc-content li > ul,
+.doc-content li > ol {
+  margin-top: 0.3em;
+  margin-bottom: 0;
+}
+
+.doc-content img {
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+.doc-content hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 2em 0;
+}
+
+/* hljs overrides for doc context */
+.doc-content .hljs {
+  background: var(--doc-code-bg, #f4f4f5);
+  padding: 0;
+}
