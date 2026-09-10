@@ -1,14 +1,16 @@
 interface ToolbarProps {
   showStylePanel: boolean;
   onToggleStyle: () => void;
-  onExport: () => void;
+  onExportPdf: () => void;
+  onExportDocx: () => void;
+  isExportingDocx: boolean;
 }
 
-export default function Toolbar({ showStylePanel, onToggleStyle, onExport }: ToolbarProps) {
+export default function Toolbar({ showStylePanel, onToggleStyle, onExportPdf, onExportDocx, isExportingDocx }: ToolbarProps) {
   return (
     <header className="toolbar">
       <div className="toolbar-brand">
-        MD<span>→</span>PDF
+        MD<span>→</span>PDF / DOCX
       </div>
 
       <button
@@ -23,7 +25,15 @@ export default function Toolbar({ showStylePanel, onToggleStyle, onExport }: Too
         Style
       </button>
 
-      <button className="export-btn" onClick={onExport} title="Export as PDF">
+      <button className="export-btn export-docx" onClick={onExportDocx} disabled={isExportingDocx} title="Download as a Word document">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M12 3v13m0 0l-4-4m4 4l4-4" />
+          <path d="M3 19h18" />
+        </svg>
+        {isExportingDocx ? 'Creating…' : 'Export DOCX'}
+      </button>
+
+      <button className="export-btn" onClick={onExportPdf} title="Export as PDF">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path d="M12 3v13m0 0l-4-4m4 4l4-4" />
           <path d="M3 19h18" />

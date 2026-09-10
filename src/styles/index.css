@@ -89,6 +89,12 @@ body {
 
 .export-btn:hover { opacity: 0.85; }
 .export-btn:active { transform: scale(0.97); }
+.export-btn:disabled { opacity: 0.55; cursor: wait; }
+.export-btn.export-docx {
+  background: transparent;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+}
 
 /* ── Workspace ───────────────────────────── */
 .app {

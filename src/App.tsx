@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { defaultStyle, type DocStyle } from './types';
 import { useDebounce } from './hooks/useDebounce';
 import { exportToPdf } from './utils/pdf';
+import { exportToDocx } from './utils/docx';
 import Toolbar from './components/Toolbar';
 import Editor from './components/Editor';
 import PagePreview from './components/PagePreview';
@@ -10,7 +11,7 @@ import './styles/index.css';
 
 const SAMPLE = `# Getting Started
 
-Welcome to **MD → PDF** — write Markdown on the left, see a page preview in the center, and export a clean PDF when you're done.
+Welcome to **MD → PDF / DOCX** — write Markdown on the left, see a page preview in the center, and export a clean PDF or Word document when you're done.
 
 ## What's supported
 
@@ -38,6 +39,7 @@ console.log(greet('world'));
 | Markdown       | ✅      |
 | Syntax highlight | ✅    |
 | PDF export     | ✅      |
+| DOCX export    | ✅      |
 | Style editor   | ✅      |
 
 ## Blockquote
@@ -53,13 +55,26 @@ export default function App() {
   const [markdown, setMarkdown] = useState(SAMPLE);
   const [docStyle, setDocStyle] = useState<DocStyle>(defaultStyle);
   const [showStylePanel, setShowStylePanel] = useState(false);
+  const [isExportingDocx, setIsExportingDocx] = useState(false);
 
   const previewMarkdown = useDebounce(markdown, 700);
   const previewStyle = useDebounce(docStyle, 200);
   const isStale = markdown !== previewMarkdown;
 
-  const handleExport = useCallback(() => {
+  const handlePdfExport = useCallback(() => {
     exportToPdf(previewMarkdown, previewStyle);
+  }, [previewMarkdown, previewStyle]);
+
+  const handleDocxExport = useCallback(async () => {
+    setIsExportingDocx(true);
+    try {
+      await exportToDocx(previewMarkdown, previewStyle);
+    } catch (error) {
+      console.error(error);
+      alert('Could not create the DOCX file. Please try again.');
+    } finally {
+      setIsExportingDocx(false);
+    }
   }, [previewMarkdown, previewStyle]);
 
   return (
@@ -67,7 +82,9 @@ export default function App() {
       <Toolbar
         showStylePanel={showStylePanel}
         onToggleStyle={() => setShowStylePanel(v => !v)}
-        onExport={handleExport}
+        onExportPdf={handlePdfExport}
+        onExportDocx={handleDocxExport}
+        isExportingDocx={isExportingDocx}
       />
       <div className="workspace">
         <Editor value={markdown} onChange={setMarkdown} />
