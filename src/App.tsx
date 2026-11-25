@@ -1,11 +1,9 @@
-import { type RefObject, useCallback, useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { defaultStyle, type DocStyle } from './types';
 import { exportToPdf } from './utils/pdf';
 import { downloadBlob, exportToDocx } from './utils/docx';
 import { fileBaseName } from './utils/markdown';
-import {
-  type Draft, backupDraft, clearBackup, loadBackup, loadDraft, readShareFromHash, saveDraft, shareUrl,
-} from './utils/storage';
+import { type Draft, loadDraft, saveDraft } from './utils/storage';
 import Toolbar from './components/Toolbar';
 import Editor, { type EditorHandle } from './components/Editor';
 import PagePreview, { type PreviewHandle } from './components/PagePreview';
@@ -74,56 +72,22 @@ flowchart LR
 Shortcuts: **Ctrl+B** bold, **Ctrl+I** italic, **Ctrl+K** link, **Ctrl+S** save .md, **Ctrl+O** open, **Ctrl+P** export PDF.
 `;
 
-interface Initial {
-  draft: Draft;
-  fromShare: boolean;
-}
-
-function initialState(): Initial {
-  const shared = readShareFromHash();
-  const saved = loadDraft();
-  if (shared) {
-    if (saved && saved.markdown !== shared.markdown) backupDraft(saved);
-    return { draft: shared, fromShare: true };
-  }
-  return { draft: saved ?? { markdown: SAMPLE, style: defaultStyle }, fromShare: false };
-}
-
-// Module-level so the toast's restore action (created during the first render) can reach the editor.
-const editorHandle: { current: EditorHandle | null } = { current: null };
-let restoreStyle: (style: DocStyle) => void = () => {};
-
-/** If a shared link replaced the user's draft, offer to bring it back. */
-function sharedToast(initial: Initial): ToastMessage | null {
-  if (!initial.fromShare) return null;
-  const backup = loadBackup();
-  if (!backup) return { id: 1, text: 'Opened a shared document.' };
-  return {
-    id: 1,
-    text: 'Opened a shared document. Your previous draft was replaced.',
-    action: {
-      label: 'Restore my draft',
-      run: () => {
-        editorHandle.current?.replaceAll(backup.markdown);
-        restoreStyle(backup.style);
-        clearBackup();
-      },
-    },
-  };
+function initialDraft(): Draft {
+  return loadDraft() ?? { markdown: SAMPLE, style: defaultStyle };
 }
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
 export default function App() {
-  const [initial] = useState(initialState);
-  const [markdown, setMarkdown] = useState(initial.draft.markdown);
-  const [docStyle, setDocStyle] = useState<DocStyle>(initial.draft.style);
+  const [initial] = useState(initialDraft);
+  const [markdown, setMarkdown] = useState(initial.markdown);
+  const [docStyle, setDocStyle] = useState<DocStyle>(initial.style);
   const [showStylePanel, setShowStylePanel] = useState(false);
   const [busy, setBusy] = useState<'pdf' | 'docx' | null>(null);
-  const [toast, setToast] = useState<ToastMessage | null>(() => sharedToast(initial));
+  const [toast, setToast] = useState<ToastMessage | null>(null);
 
+  const editor = useRef<EditorHandle>(null);
   const preview = useRef<PreviewHandle>(null);
-  useEffect(() => { restoreStyle = setDocStyle; }, []);
 
   const previewMarkdown = useDeferredValue(markdown);
   const previewStyle = useDeferredValue(docStyle);
@@ -145,36 +109,19 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [markdown, docStyle]);
 
-  // Drop the (possibly huge) share hash so a refresh loads the autosaved copy instead.
-  useEffect(() => {
-    if (initial.fromShare) history.replaceState(null, '', location.pathname + location.search);
-  }, [initial.fromShare]);
-
   const openFile = useCallback(async (file: File) => {
     if (file.size > MAX_FILE_BYTES) {
       notify('That file is larger than 5 MB.', { tone: 'error' });
       return;
     }
     const text = await file.text();
-    editorHandle.current?.replaceAll(text);
+    editor.current?.replaceAll(text);
     notify(`Opened ${file.name}. Press Ctrl+Z to undo.`);
   }, [notify]);
 
   const saveMarkdown = useCallback(() => {
     downloadBlob(new Blob([markdown], { type: 'text/markdown;charset=utf-8' }), `${fileBaseName(markdown)}.md`);
   }, [markdown]);
-
-  const share = useCallback(async () => {
-    const url = shareUrl({ markdown, style: docStyle });
-    try {
-      await navigator.clipboard.writeText(url);
-      notify(url.length > 8000
-        ? 'Link copied. It is long, so some apps may cut it off.'
-        : 'Link copied. Anyone with it can open this document.');
-    } catch {
-      notify('Could not copy to the clipboard.', { tone: 'error' });
-    }
-  }, [markdown, docStyle, notify]);
 
   const exportPdf = useCallback(async () => {
     if (busy) return;
@@ -233,14 +180,13 @@ export default function App() {
         onToggleStyle={() => setShowStylePanel(v => !v)}
         onOpenFile={file => void openFile(file)}
         onSaveMarkdown={saveMarkdown}
-        onShare={() => void share()}
         onExportPdf={() => void exportPdf()}
         onExportDocx={() => void exportDocx()}
         busy={busy}
       />
       <div className={`workspace ${showStylePanel ? 'with-style-panel' : ''}`}>
         <Editor
-          ref={editorHandle as RefObject<EditorHandle>}
+          ref={editor}
           value={markdown}
           onChange={setMarkdown}
           onOpenFile={file => void openFile(file)}

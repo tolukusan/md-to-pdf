@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { buildPrintHtml, cssString, scopeCustomCss } from '../utils/pdf';
-import { decodeShare, encodeShare } from '../utils/storage';
 import { defaultStyle, normalizeStyle } from '../types';
 
 describe('buildPrintHtml', () => {
@@ -22,27 +21,26 @@ describe('buildPrintHtml', () => {
   });
 
   it('scopes custom CSS and blocks closing the style tag', () => {
-    expect(scopeCustomCss('h1{color:red}</style><script>')).toBe('.doc-content {\nh1{color:red}><script>\n}');
+    expect(scopeCustomCss('h1{color:red}</style><script>')).toBe('.doc-content {\nh1{color:red}/style>script>\n}');
+    expect(scopeCustomCss('<</stylestyle>')).not.toContain('<');
     expect(scopeCustomCss('  ')).toBe('');
     expect(cssString('a\nb\\')).toBe('"a b\\\\"');
   });
 });
 
-describe('share links', () => {
-  it('round-trips a document and style', () => {
-    const draft = { markdown: '# Hi\n\nÜnïcödé ✅', style: { ...defaultStyle, toc: true } };
-    expect(decodeShare(encodeShare(draft))).toEqual(draft);
-  });
-
-  it('rejects garbage', () => {
-    expect(decodeShare('not-valid')).toBeNull();
-  });
-
-  it('ignores unknown or wrongly typed style fields', () => {
+describe('normalizeStyle', () => {
+  it('ignores unknown or wrongly typed fields', () => {
     const style = normalizeStyle({ fontSize: 'big', toc: true, evil: 1, pageSize: 'Tabloid' });
     expect(style.fontSize).toBe(defaultStyle.fontSize);
     expect(style.toc).toBe(true);
     expect(style.pageSize).toBe('A4');
     expect('evil' in style).toBe(false);
+  });
+
+  it('rejects colours and fonts that could break out of CSS', () => {
+    const style = normalizeStyle({ bgColor: 'red; } body { display:none', fontFamily: 'x</style><script>', linkColor: '#abc' });
+    expect(style.bgColor).toBe(defaultStyle.bgColor);
+    expect(style.fontFamily).toBe(defaultStyle.fontFamily);
+    expect(style.linkColor).toBe('#abc');
   });
 });

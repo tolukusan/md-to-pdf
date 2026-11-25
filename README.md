@@ -12,7 +12,7 @@ Live: https://md-to-pdf-opal.vercel.app/
 - **DOCX export**: real Word headings, numbered and bulleted lists, tables, code blocks, embedded images and diagrams, a linked table of contents, headers, footers and page numbers
 - **Styling**: four themes plus font, size, line height, colours, margins and custom CSS
 - **Extras**: KaTeX math (`$x^2$`, `$$...$$`), Mermaid diagrams (` ```mermaid `), task lists, and `\pagebreak` on its own line for a manual page break
-- **Files and sharing**: open or drag in a `.md` file, save as `.md`, or copy a share link (the whole document is compressed into the URL)
+- **Files**: open or drag in a `.md` file or save as `.md`
 - **Autosave**: your document and settings are kept in this browser's local storage
 
 ### Shortcuts
@@ -39,7 +39,7 @@ Live: https://md-to-pdf-opal.vercel.app/
 ```bash
 pnpm install
 pnpm dev        # http://localhost:5173
-pnpm test       # Vitest unit tests (Markdown pipeline, DOCX output, print HTML, share links)
+pnpm test       # Vitest unit tests (Markdown pipeline, DOCX output, print HTML, style validation)
 pnpm lint       # ESLint
 pnpm build      # type-check, then build a single self-contained dist/index.html
 ```
@@ -50,13 +50,13 @@ All rendered HTML goes through DOMPurify before it reaches the preview, the prin
 
 ```
 src/
-  App.tsx                 state, autosave, shortcuts, share links
+  App.tsx                 state, autosave, shortcuts, file open/save
   components/             Toolbar, Editor (CodeMirror), PagePreview, StylePanel, Toast
   hooks/useRenderedHtml   Markdown → HTML for the preview, with async Mermaid rendering
   utils/markdown.ts       marked + highlight.js + KaTeX, sanitising, heading ids, TOC, page breaks
   utils/mermaid.ts        loads Mermaid on demand and renders diagrams to SVG
   utils/pdf.ts            print HTML (@page rules, margin boxes) and the hidden-iframe print
   utils/docx.ts           HTML → Word document
-  utils/storage.ts        autosave and share-link encoding
+  utils/storage.ts        autosave
   styles/document.css     document styles shared by the preview and the PDF
 ```

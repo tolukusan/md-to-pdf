@@ -124,6 +124,16 @@ export function normalizeStyle(input: unknown): DocStyle {
     }
   }
   if (!(result.pageSize in PAGE_SIZES)) result.pageSize = 'A4';
+  // These values are written into CSS, so only accept plain colours and font lists.
+  for (const key of ['textColor', 'bgColor', 'headingColor', 'linkColor', 'codeBg'] as const) {
+    if (!/^#[0-9a-f]{3,8}$/i.test(result[key])) result[key] = defaultStyle[key];
+  }
+  for (const key of ['fontFamily', 'codeFont'] as const) {
+    if (!/^[\w\s'",.-]+$/.test(result[key])) result[key] = defaultStyle[key];
+  }
+  for (const key of ['fontSize', 'lineHeight', 'marginTopMm', 'marginBottomMm', 'marginLeftMm', 'marginRightMm'] as const) {
+    if (!Number.isFinite(result[key])) result[key] = defaultStyle[key];
+  }
   return result;
 }
 

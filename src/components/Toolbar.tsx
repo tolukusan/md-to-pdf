@@ -5,7 +5,6 @@ interface ToolbarProps {
   onToggleStyle: () => void;
   onOpenFile: (file: File) => void;
   onSaveMarkdown: () => void;
-  onShare: () => void;
   onExportPdf: () => void;
   onExportDocx: () => void;
   busy: 'pdf' | 'docx' | null;
@@ -22,7 +21,7 @@ const DownloadIcon = () => (
 );
 
 export default function Toolbar(props: ToolbarProps) {
-  const { showStylePanel, onToggleStyle, onOpenFile, onSaveMarkdown, onShare, onExportPdf, onExportDocx, busy } = props;
+  const { showStylePanel, onToggleStyle, onOpenFile, onSaveMarkdown, onExportPdf, onExportDocx, busy } = props;
   const fileInput = useRef<HTMLInputElement>(null);
 
   return (
@@ -53,14 +52,6 @@ export default function Toolbar(props: ToolbarProps) {
         <button className="toolbar-btn" onClick={onSaveMarkdown} title={`Download the Markdown source (${mod}S)`}>
           <DownloadIcon />
           .md
-        </button>
-
-        <button className="toolbar-btn" onClick={onShare} title="Copy a link that contains this document">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1 1" />
-            <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1-1" />
-          </svg>
-          Share
         </button>
 
         <button

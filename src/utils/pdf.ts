@@ -12,9 +12,9 @@ export function cssString(text: string): string {
   return `"${text.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/[\r\n]+/g, ' ')}"`;
 }
 
-/** User CSS is nested under .doc-content and may not close the <style> element. */
+/** User CSS is nested under .doc-content. `<` never appears in valid CSS, so dropping it means the <style> element cannot be closed. */
 export function scopeCustomCss(css: string): string {
-  const safe = css.replace(/<\/?style/gi, '');
+  const safe = css.replace(/</g, '');
   return safe.trim() ? `.doc-content {\n${safe}\n}` : '';
 }
 
