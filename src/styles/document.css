@@ -135,3 +135,74 @@
   background: var(--doc-code-bg, #f4f4f5);
   padding: 0;
 }
+
+.doc-content > :first-child { margin-top: 0; }
+
+/* Task lists */
+.doc-content ul.task-list { list-style: none; padding-left: 0.25em; }
+.doc-content li.task-item > input[type='checkbox'] { margin: 0 0.5em 0 0; vertical-align: middle; }
+
+/* Table of contents */
+.doc-content nav.toc {
+  margin: 0 0 1.5em;
+  padding: 0.75em 1em;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  break-inside: avoid;
+}
+.doc-content .toc-title { font-weight: 700; margin: 0 0 0.4em; color: var(--doc-heading, #111111); }
+.doc-content nav.toc ul { list-style: none; padding-left: 0; margin: 0; }
+.doc-content nav.toc li { margin-bottom: 0.15em; }
+.doc-content nav.toc a { text-decoration: none; }
+.doc-content nav.toc .toc-level-2 { padding-left: 1.25em; }
+.doc-content nav.toc .toc-level-3 { padding-left: 2.5em; font-size: 0.95em; }
+
+/* Explicit page breaks (\pagebreak or \newpage on its own line) */
+.doc-content .page-break {
+  break-after: page;
+  height: 0;
+  margin: 1.5em 0;
+  border-top: 1px dashed #bbb;
+  position: relative;
+}
+.doc-content .page-break::after {
+  content: 'page break';
+  position: absolute;
+  top: -0.7em;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--doc-bg, #fff);
+  color: #999;
+  font: 10px/1.4 system-ui, sans-serif;
+  padding: 0 0.5em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Diagrams */
+.doc-content .mermaid-diagram { margin: 0 0 1em; text-align: center; break-inside: avoid; }
+.doc-content .mermaid-diagram svg { max-width: 100%; height: auto; }
+.doc-content pre.mermaid-source {
+  background: var(--doc-code-bg, #f4f4f5);
+  padding: 1em 1.25em;
+  border-radius: 6px;
+  margin: 0 0 1em;
+  font-family: var(--doc-code-font, monospace);
+  font-size: 0.8em;
+  white-space: pre-wrap;
+  color: #666;
+}
+.doc-content pre.mermaid-source[data-error]::before {
+  content: 'Diagram error: ' attr(data-error);
+  display: block;
+  color: #b91c1c;
+  margin-bottom: 0.5em;
+  font-family: system-ui, sans-serif;
+}
+
+/* Math */
+.doc-content .katex-display { margin: 0 0 1em; overflow-x: auto; overflow-y: hidden; }
+
+/* Keep blocks together where possible when printing */
+.doc-content pre, .doc-content blockquote, .doc-content table, .doc-content img { break-inside: avoid; }
+.doc-content h1, .doc-content h2, .doc-content h3, .doc-content h4 { break-after: avoid; }
